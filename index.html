@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empty Leg Private Jet Deals | 50-75% Off Charter Flights</title>
-    <meta name="description" content="Live empty leg private jet flights at 50-75% discount. Real-time availability, instant booking. Luxury travel for less.">
+    <title>Empty Leg Private Jet Deals | Live Luxury Flights</title>
+    <meta name="description" content="Real-time empty leg private jet flights at 50-75% off. Live availability with instant booking. Save thousands on luxury travel.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -25,7 +25,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: var(--dark);
-            background: #f5f7fa;
+            background: #f8fafc;
             min-height: 100vh;
         }
         
@@ -54,28 +54,37 @@
             color: var(--accent);
         }
         
+        .status {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
         .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(rgba(26, 54, 93, 0.9), rgba(26, 54, 93, 0.9)),
+                        url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
             color: white;
-            padding: 3rem 0;
+            padding: 4rem 0;
             text-align: center;
             margin-bottom: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
         }
         
         .controls {
             background: white;
             padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 2rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
         }
         
         .search-box {
-            flex: 1;
-            min-width: 250px;
+            margin-bottom: 1rem;
         }
         
         .search-box input {
@@ -98,9 +107,10 @@
             border-radius: 25px;
             background: white;
             cursor: pointer;
+            font-size: 0.9rem;
         }
         
-        .refresh-btn {
+        button.primary {
             background: var(--primary);
             color: white;
             border: none;
@@ -123,7 +133,7 @@
         
         .flight-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
         
         .flight-header {
@@ -133,6 +143,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        
+        .flight-aircraft {
+            font-weight: bold;
         }
         
         .flight-price {
@@ -158,6 +172,7 @@
         
         .origin, .destination {
             text-align: center;
+            flex: 1;
         }
         
         .origin i, .destination i {
@@ -166,10 +181,15 @@
             margin-bottom: 5px;
         }
         
+        .arrow {
+            padding: 0 1rem;
+            color: #718096;
+        }
+        
         .flight-details {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+            gap: 0.75rem;
             margin-bottom: 1rem;
         }
         
@@ -177,6 +197,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .detail-item i {
+            color: var(--primary);
+            width: 16px;
         }
         
         .book-btn {
@@ -191,6 +217,11 @@
             font-size: 1rem;
             cursor: pointer;
             text-decoration: none;
+            transition: background 0.3s;
+        }
+        
+        .book-btn:hover {
+            background: var(--secondary);
         }
         
         footer {
@@ -198,12 +229,13 @@
             color: white;
             padding: 2rem 0;
             text-align: center;
+            margin-top: 3rem;
         }
         
         .loading {
+            grid-column: 1 / -1;
             text-align: center;
             padding: 3rem;
-            grid-column: 1 / -1;
         }
         
         .spinner {
@@ -221,12 +253,26 @@
             100% { transform: rotate(360deg); }
         }
         
+        .error-message {
+            background: #fed7d7;
+            color: #9b2c2c;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .flight-grid {
                 grid-template-columns: 1fr;
             }
-            .controls {
+            
+            .filters {
                 flex-direction: column;
+            }
+            
+            select, button {
+                width: 100%;
             }
         }
     </style>
@@ -238,36 +284,47 @@
                 <div class="logo">
                     <i class="fas fa-plane"></i> EmptyLeg Deals
                 </div>
-                <div id="status">Loading flights...</div>
+                <div class="status" id="status">
+                    <i class="fas fa-sync-alt fa-spin"></i> Loading...
+                </div>
             </div>
         </div>
     </header>
 
     <section class="hero">
         <div class="container">
-            <h1>Luxury Empty Leg Private Jet Flights</h1>
-            <p>Save 50-75% on private jet charters • Live availability • Instant booking</p>
+            <h1>Luxury Empty Leg Private Jets</h1>
+            <p>Save 50-75% on private jet charters • Real-time availability • Instant booking</p>
         </div>
     </section>
 
     <main class="container">
+        <div class="error-message" id="errorMessage"></div>
+        
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="search" placeholder="Search flights...">
+                <input type="text" id="search" placeholder="Search flights by route, aircraft, or city...">
             </div>
             <div class="filters">
                 <select id="priceFilter">
                     <option value="">All Prices</option>
-                    <option value="5000">Under $5,000</option>
                     <option value="10000">Under $10,000</option>
+                    <option value="20000">Under $20,000</option>
+                    <option value="50000">Under $50,000</option>
                 </select>
-                <button id="refresh" class="refresh-btn">
-                    <i class="fas fa-sync-alt"></i> Refresh
+                <select id="seatsFilter">
+                    <option value="">Any Seats</option>
+                    <option value="4">4+ Seats</option>
+                    <option value="8">8+ Seats</option>
+                    <option value="12">12+ Seats</option>
+                </select>
+                <button id="refresh" class="primary">
+                    <i class="fas fa-sync-alt"></i> Refresh Flights
                 </button>
             </div>
         </div>
 
-        <div class="flight-grid" id="flights">
+        <div class="flight-grid" id="flightsContainer">
             <div class="loading">
                 <div class="spinner"></div>
                 <p>Loading available flights...</p>
@@ -277,308 +334,372 @@
 
     <footer>
         <div class="container">
-            <p>© 2024 Empty Leg Deals • All flights via Villiers • Affiliate commissions may be earned</p>
+            <p><strong>Empty Leg Jet Deals</strong> • Partnered with Villiers • Affiliate commissions may be earned</p>
             <p id="updateTime">Last updated: --:--</p>
         </div>
     </footer>
 
-   // REPLACE the entire <script> section in your HTML with this:
-
-<script>
-    let allFlights = [];
-    
-    async function loadFlights() {
-        try {
-            showLoading();
-            
-            // Try to fetch real data first
-            await fetchRealFlights();
-            
-        } catch (error) {
-            console.log('Using sample data as fallback');
-            showSampleData();
-        }
-    }
-    
-    function showLoading() {
-        document.getElementById('flightGrid').innerHTML = `
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading available empty leg flights...</p>
-            </div>
-        `;
-    }
-    
-    async function fetchRealFlights() {
-        try {
-            const rssUrl = 'https://api.villiers.ai/feeds/empty-legs?id=7907';
-            
-            // Using a reliable CORS proxy
-            const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(rssUrl);
-            
-            const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error('Network response failed');
-            
-            const data = await response.json();
-            const xmlText = data.contents;
-            
-            // Parse the XML
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-            
-            // Check for errors
-            if (xmlDoc.querySelector('parsererror')) {
-                throw new Error('XML parsing error');
-            }
-            
-            // Extract flights from RSS
-            const items = xmlDoc.querySelectorAll('item');
-            const flights = [];
-            
-            items.forEach(item => {
-                try {
-                    // Helper function to get namespaced values
-                    const getNamespacedValue = (localName) => {
-                        // Try different ways to access namespaced elements
-                        const element = item.querySelector(`[local-name()="${localName}"]`) || 
-                                        item.querySelector(`villiers\\:${localName}`) ||
-                                        item.querySelector(localName);
-                        return element ? element.textContent.trim() : '';
-                    };
-                    
-                    // Get the regular link
-                    const linkElement = item.querySelector('link');
-                    const baseLink = linkElement ? linkElement.textContent.trim() : 'https://villiers.ai/empty-legs';
-                    
-                    // Ensure affiliate ID is in URL
-                    let affiliateLink = baseLink;
-                    if (!affiliateLink.includes('id=7907') && !affiliateLink.includes('ref=7907')) {
-                        affiliateLink += (affiliateLink.includes('?') ? '&' : '?') + 'id=7907';
-                    }
-                    
-                    const flight = {
-                        timestamp: new Date().toISOString(),
-                        aircraft: getNamespacedValue('aircraftType') || 'Private Jet',
-                        origin: getNamespacedValue('originAirport') || '',
-                        destination: getNamespacedValue('destinationAirport') || '',
-                        date: getNamespacedValue('departureDate') || '',
-                        price: getNamespacedValue('price') || 'Price on request',
-                        seats: getNamespacedValue('seatsAvailable') || '',
-                        duration: getNamespacedValue('flightDuration') || 'Direct',
-                        link: affiliateLink
-                    };
-                    
-                    // Only add if we have basic data
-                    if (flight.aircraft && flight.origin && flight.destination) {
-                        flights.push(flight);
-                    }
-                } catch (itemError) {
-                    console.log('Error parsing flight item:', itemError);
-                }
-            });
-            
-            if (flights.length > 0) {
-                allFlights = flights;
-                displayFlights(flights);
-                updateStatus(`Live: ${flights.length} flights available`, true);
-                return true;
-            } else {
-                throw new Error('No valid flights found in RSS');
-            }
-            
-        } catch (error) {
-            console.log('Real data fetch failed:', error);
-            return false;
-        }
-    }
-    
-    function showSampleData() {
-        const sampleFlights = [
-            {
-                timestamp: new Date().toISOString(),
-                aircraft: "Gulfstream G650",
-                origin: "Teterboro, NJ (KTEB)",
-                destination: "Miami, FL (KMIA)",
-                date: "March 15, 2024",
-                price: "$12,500",
-                seats: "8",
-                duration: "2h 45m",
-                link: "https://villiers.ai/empty-legs?id=7907"
-            },
-            {
-                timestamp: new Date().toISOString(),
-                aircraft: "Citation XLS",
-                origin: "London Biggin Hill (EGKB)",
-                destination: "Paris Le Bourget (LFPB)",
-                date: "March 18, 2024",
-                price: "£8,900",
-                seats: "6",
-                duration: "1h 15m",
-                link: "https://villiers.ai/empty-legs?id=7907"
-            },
-            {
-                timestamp: new Date().toISOString(),
-                aircraft: "Bombardier Global 6000",
-                origin: "Los Angeles, CA (KLAX)",
-                destination: "New York, NY (KJFK)",
-                date: "March 20, 2024",
-                price: "$18,750",
-                seats: "12",
-                duration: "5h 30m",
-                link: "https://villiers.ai/empty-legs?id=7907"
-            }
-        ];
-        
-        allFlights = sampleFlights;
-        displayFlights(sampleFlights);
-        updateStatus(`Demo: ${sampleFlights.length} sample flights`, false);
-    }
-    
-    function updateStatus(message, isLive) {
-        const time = new Date().toLocaleTimeString();
-        const statusEl = document.getElementById('lastUpdated');
-        
-        if (isLive) {
-            statusEl.innerHTML = `
-                <i class="fas fa-check-circle" style="color: #38a169;"></i> 
-                <span>${message} • Updated ${time}</span>
-            `;
-        } else {
-            statusEl.innerHTML = `
-                <i class="fas fa-info-circle" style="color: #d4af37;"></i> 
-                <span>${message} • Last checked ${time}</span>
-            `;
-        }
-        
-        document.getElementById('updateTime').textContent = `Last updated: ${time}`;
-    }
-    
-    function displayFlights(flights) {
-        const flightGrid = document.getElementById('flightGrid');
-        
-        if (!flights || flights.length === 0) {
-            flightGrid.innerHTML = `
-                <div class="loading">
-                    <i class="fas fa-plane-slash" style="font-size: 2rem; color: #718096;"></i>
-                    <p>No flights available at the moment. Check back soon!</p>
-                </div>
-            `;
-            return;
-        }
-        
-        flightGrid.innerHTML = flights.map(flight => `
-            <div class="flight-card">
-                <div class="flight-header">
-                    <div class="flight-aircraft">
-                        <i class="fas fa-jet-fighter-up"></i> ${flight.aircraft}
-                    </div>
-                    <div class="flight-price">${flight.price}</div>
-                </div>
-                <div class="flight-body">
-                    <div class="flight-route">
-                        <div class="origin">
-                            <i class="fas fa-plane-departure"></i>
-                            <h3>${flight.origin}</h3>
-                            <p>Departure</p>
-                        </div>
-                        <div class="flight-duration">
-                            <i class="fas fa-clock"></i>
-                            <p>${flight.duration}</p>
-                        </div>
-                        <div class="destination">
-                            <i class="fas fa-plane-arrival"></i>
-                            <h3>${flight.destination}</h3>
-                            <p>Arrival</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flight-details">
-                        <div class="detail-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span><strong>Date:</strong> ${flight.date || 'Flexible'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <i class="fas fa-users"></i>
-                            <span><strong>Seats:</strong> ${flight.seats || 'N/A'} available</span>
-                        </div>
-                        <div class="detail-item">
-                            <i class="fas fa-clock"></i>
-                            <span><strong>Type:</strong> Empty Leg</span>
-                        </div>
-                        <div class="detail-item">
-                            <i class="fas fa-percentage"></i>
-                            <span><strong>Save:</strong> 50-75%</span>
-                        </div>
-                    </div>
-                    
-                    <a href="${flight.link}" target="_blank" class="book-button" rel="noopener noreferrer">
-                        <i class="fas fa-shopping-cart"></i> Book Now & Save
-                    </a>
-                </div>
-            </div>
-        `).join('');
-    }
-    
-    function filterFlights() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const maxPrice = document.getElementById('priceFilter').value;
-        const minSeats = document.getElementById('seatsFilter').value;
-        
-        const filtered = allFlights.filter(flight => {
-            // Search term filter
-            const matchesSearch = !searchTerm || 
-                flight.aircraft.toLowerCase().includes(searchTerm) ||
-                flight.origin.toLowerCase().includes(searchTerm) ||
-                flight.destination.toLowerCase().includes(searchTerm) ||
-                flight.price.toLowerCase().includes(searchTerm);
-            
-            // Price filter
-            let matchesPrice = true;
-            if (maxPrice && flight.price) {
-                const priceNum = extractNumber(flight.price);
-                if (!isNaN(priceNum)) {
-                    matchesPrice = priceNum <= parseInt(maxPrice);
-                }
-            }
-            
-            // Seats filter
-            let matchesSeats = true;
-            if (minSeats && flight.seats) {
-                const seatsNum = extractNumber(flight.seats);
-                if (!isNaN(seatsNum)) {
-                    matchesSeats = seatsNum >= parseInt(minSeats);
-                }
-            }
-            
-            return matchesSearch && matchesPrice && matchesSeats;
+    <script>
+        // SIMPLE, WORKING SOLUTION
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFlights();
         });
         
-        displayFlights(filtered);
-    }
-    
-    function extractNumber(text) {
-        const match = text.match(/\d+/);
-        return match ? parseInt(match[0]) : NaN;
-    }
-    
-    // Event listeners
-    document.getElementById('searchInput').addEventListener('input', filterFlights);
-    document.getElementById('priceFilter').addEventListener('change', filterFlights);
-    document.getElementById('seatsFilter').addEventListener('change', filterFlights);
-    document.getElementById('refreshBtn').addEventListener('click', async () => {
-        const success = await fetchRealFlights();
-        if (!success) {
-            showSampleData();
+        let allFlights = [];
+        
+        async function loadFlights() {
+            try {
+                showLoading();
+                showMessage('Fetching live flight data...', 'info');
+                
+                // Try to get real data
+                const realData = await fetchRealData();
+                
+                if (realData && realData.length > 0) {
+                    allFlights = realData;
+                    displayFlights(realData);
+                    updateStatus(`✓ Live: ${realData.length} flights available`, 'success');
+                } else {
+                    // Fallback to sample data
+                    showSampleData();
+                }
+                
+            } catch (error) {
+                console.log('Error loading flights:', error);
+                showSampleData();
+            }
         }
-    });
-    
-    // Auto-refresh every 5 minutes
-    setInterval(async () => {
-        await fetchRealFlights();
-    }, 300000);
-    
-    // Initial load
-    document.addEventListener('DOMContentLoaded', loadFlights);
-</script>
+        
+        async function fetchRealData() {
+            try {
+                // Your RSS feed URL
+                const rssUrl = 'https://api.villiers.ai/feeds/empty-legs?id=7907';
+                
+                // Use CORS proxy
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl);
+                
+                showMessage('Connecting to flight database...', 'info');
+                
+                const response = await fetch(proxyUrl, {
+                    timeout: 10000
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const xmlText = await response.text();
+                
+                // Parse XML
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                
+                // Check for parsing errors
+                const parseError = xmlDoc.querySelector('parsererror');
+                if (parseError) {
+                    console.log('XML parsing error');
+                    return null;
+                }
+                
+                // Extract flight data
+                const items = xmlDoc.querySelectorAll('item');
+                const flights = [];
+                
+                items.forEach(item => {
+                    try {
+                        // Get text content with namespace handling
+                        const getValue = (tagName) => {
+                            // Try different selectors for namespaced elements
+                            const selectors = [
+                                `villiers\\:${tagName}`,
+                                `*|${tagName}`,
+                                tagName,
+                                `[local-name()="${tagName}"]`
+                            ];
+                            
+                            for (const selector of selectors) {
+                                const element = item.querySelector(selector);
+                                if (element && element.textContent && element.textContent.trim()) {
+                                    return element.textContent.trim();
+                                }
+                            }
+                            return '';
+                        };
+                        
+                        // Get regular link
+                        const linkElem = item.querySelector('link');
+                        let link = linkElem ? linkElem.textContent.trim() : 'https://villiers.ai/empty-legs';
+                        
+                        // Ensure affiliate ID
+                        if (!link.includes('id=') && !link.includes('ref=')) {
+                            link += (link.includes('?') ? '&' : '?') + 'id=7907';
+                        }
+                        
+                        const flight = {
+                            aircraft: getValue('aircraftType') || 'Private Jet',
+                            origin: getValue('originAirport') || 'Not specified',
+                            destination: getValue('destinationAirport') || 'Not specified',
+                            date: getValue('departureDate') || 'Flexible dates',
+                            price: getValue('price') || 'Contact for price',
+                            seats: getValue('seatsAvailable') || 'N/A',
+                            duration: getValue('flightDuration') || 'Direct flight',
+                            link: link
+                        };
+                        
+                        // Only add if we have basic info
+                        if (flight.aircraft && flight.origin && flight.destination) {
+                            flights.push(flight);
+                        }
+                    } catch (e) {
+                        console.log('Error parsing item:', e);
+                    }
+                });
+                
+                return flights.length > 0 ? flights : null;
+                
+            } catch (error) {
+                console.log('Failed to fetch real data:', error);
+                return null;
+            }
+        }
+        
+        function showSampleData() {
+            const sampleFlights = [
+                {
+                    aircraft: "Gulfstream G650",
+                    origin: "New York (Teterboro - KTEB)",
+                    destination: "Miami (Opa-locka - KOPF)",
+                    date: "April 10, 2024",
+                    price: "$14,500",
+                    seats: "8",
+                    duration: "2h 45m",
+                    link: "https://villiers.ai/empty-legs?id=7907"
+                },
+                {
+                    aircraft: "Citation XLS",
+                    origin: "London (Biggin Hill - EGKB)",
+                    destination: "Paris (Le Bourget - LFPB)",
+                    date: "April 12, 2024",
+                    price: "€9,200",
+                    seats: "6",
+                    duration: "1h 15m",
+                    link: "https://villiers.ai/empty-legs?id=7907"
+                },
+                {
+                    aircraft: "Bombardier Global 6000",
+                    origin: "Los Angeles (Van Nuys - KVNY)",
+                    destination: "Aspen (ASE)",
+                    date: "April 15, 2024",
+                    price: "$22,000",
+                    seats: "12",
+                    duration: "2h 10m",
+                    link: "https://villiers.ai/empty-legs?id=7907"
+                },
+                {
+                    aircraft: "Falcon 7X",
+                    origin: "Dubai (Al Maktoum - OMDW)",
+                    destination: "London (Luton - EGGW)",
+                    date: "April 18, 2024",
+                    price: "$35,000",
+                    seats: "10",
+                    duration: "7h 00m",
+                    link: "https://villiers.ai/empty-legs?id=7907"
+                },
+                {
+                    aircraft: "Hawker 800XP",
+                    origin: "Chicago (Midway - KMDW)",
+                    destination: "West Palm Beach (KPBI)",
+                    date: "April 20, 2024",
+                    price: "$8,900",
+                    seats: "7",
+                    duration: "2h 30m",
+                    link: "https://villiers.ai/empty-legs?id=7907"
+                },
+                {
+                    aircraft: "Embraer Phenom 300",
+                    origin: "Las Vegas (KHND)",
+                    destination: "San Francisco (KSFO)",
+                    date: "April 22, 2024",
+                    price: "$6,500",
+                    seats: "5",
+                    duration: "1h 25m",
+                    link: "https://villiers.ai/empty-legs?id=7907"
+                }
+            ];
+            
+            allFlights = sampleFlights;
+            displayFlights(sampleFlights);
+            updateStatus(`Demo: ${sampleFlights.length} sample flights • Click refresh for live data`, 'warning');
+            showMessage('Showing sample data. Live data will load when available.', 'warning');
+        }
+        
+        function displayFlights(flights) {
+            const container = document.getElementById('flightsContainer');
+            
+            if (!flights || flights.length === 0) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-plane-slash" style="font-size: 2rem; color: #718096;"></i>
+                        <p>No flights available at the moment.</p>
+                        <button onclick="loadFlights()" style="margin-top: 1rem; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = flights.map(flight => `
+                <div class="flight-card">
+                    <div class="flight-header">
+                        <div class="flight-aircraft">
+                            <i class="fas fa-plane"></i> ${flight.aircraft}
+                        </div>
+                        <div class="flight-price">${flight.price}</div>
+                    </div>
+                    <div class="flight-body">
+                        <div class="flight-route">
+                            <div class="origin">
+                                <i class="fas fa-plane-departure"></i>
+                                <h4>${flight.origin}</h4>
+                                <small>Departure</small>
+                            </div>
+                            <div class="arrow">
+                                <i class="fas fa-arrow-right"></i>
+                                <p><small>${flight.duration}</small></p>
+                            </div>
+                            <div class="destination">
+                                <i class="fas fa-plane-arrival"></i>
+                                <h4>${flight.destination}</h4>
+                                <small>Arrival</small>
+                            </div>
+                        </div>
+                        
+                        <div class="flight-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${flight.date}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-users"></i>
+                                <span>${flight.seats} seats</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-percentage"></i>
+                                <span>Save 50-75%</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-bolt"></i>
+                                <span>Empty Leg</span>
+                            </div>
+                        </div>
+                        
+                        <a href="${flight.link}" target="_blank" class="book-btn" onclick="trackBooking('${flight.aircraft}')">
+                            <i class="fas fa-shopping-cart"></i> Book Now & Save
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Update timestamp
+            const now = new Date();
+            document.getElementById('updateTime').textContent = 
+                `Last updated: ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        }
+        
+        function showLoading() {
+            document.getElementById('flightsContainer').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading available flights...</p>
+                </div>
+            `;
+        }
+        
+        function updateStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'warning' ? 'fa-info-circle' : 'fa-sync-alt';
+            const color = type === 'success' ? '#38a169' : 
+                         type === 'warning' ? '#d4af37' : '#718096';
+            
+            statusEl.innerHTML = `
+                <i class="fas ${icon}" style="color: ${color};"></i>
+                <span>${message}</span>
+            `;
+        }
+        
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('errorMessage');
+            const bgColor = type === 'error' ? '#fed7d7' : 
+                           type === 'warning' ? '#feebc8' : '#c6f6d5';
+            const textColor = type === 'error' ? '#9b2c2c' : 
+                             type === 'warning' ? '#9c4221' : '#276749';
+            
+            messageEl.style.display = 'block';
+            messageEl.style.background = bgColor;
+            messageEl.style.color = textColor;
+            messageEl.innerHTML = `<i class="fas fa-info-circle"></i> ${text}`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+        
+        function trackBooking(aircraft) {
+            console.log('Booking initiated for:', aircraft);
+            // Add analytics here
+        }
+        
+        // Event listeners
+        document.getElementById('search').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const filtered = allFlights.filter(flight => 
+                flight.aircraft.toLowerCase().includes(term) ||
+                flight.origin.toLowerCase().includes(term) ||
+                flight.destination.toLowerCase().includes(term) ||
+                flight.price.toLowerCase().includes(term)
+            );
+            displayFlights(filtered);
+        });
+        
+        document.getElementById('priceFilter').addEventListener('change', function(e) {
+            const maxPrice = parseInt(e.target.value);
+            if (!maxPrice) {
+                displayFlights(allFlights);
+                return;
+            }
+            
+            const filtered = allFlights.filter(flight => {
+                const priceNum = parseInt(flight.price.replace(/[^0-9]/g, ''));
+                return !isNaN(priceNum) && priceNum <= maxPrice;
+            });
+            displayFlights(filtered);
+        });
+        
+        document.getElementById('seatsFilter').addEventListener('change', function(e) {
+            const minSeats = parseInt(e.target.value);
+            if (!minSeats) {
+                displayFlights(allFlights);
+                return;
+            }
+            
+            const filtered = allFlights.filter(flight => {
+                const seatsNum = parseInt(flight.seats);
+                return !isNaN(seatsNum) && seatsNum >= minSeats;
+            });
+            displayFlights(filtered);
+        });
+        
+        document.getElementById('refresh').addEventListener('click', function() {
+            loadFlights();
+        });
+        
+        // Auto-refresh every 2 minutes
+        setInterval(() => {
+            loadFlights();
+        }, 120000);
+    </script>
 </body>
 </html>
